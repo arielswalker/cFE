@@ -56,43 +56,44 @@ jobs:
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     
     steps:
-      - name: Dispatch internal
-        if: ${{ env.REPO_OWNER == 'cFS' }}
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'cFS',
-              repo: 'cFS',
-              workflow_id: 'build-deploy-doc.yml',
-              ref: '${{ github.ref_name }}',
-              inputs: {
-                target: process.env.TARGET,
-                cache_key: process.env.CACHE_KEY,
-                buildpdf: process.env.BUILDPDF,
-                deploy: process.env.DEPLOY
-              }
-            })
+    - name: Dispatch Internal Workflow
+      if: ${{ env.REPO_OWNER == 'cDS' }}
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: 'cFS',
+            repo: 'cFS',
+            workflow_id: 'build-deploy-doc.yml',
+            ref: '${{ github.ref_name }}', // Fixed extra quote here
+            inputs: {
+              target: process.env.TARGET,
+              cache_key: process.env.CACHE_KEY,
+              buildpdf: process.env.BUILDPDF,
+              deploy: process.env.DEPLOY
+            }
+          })
+    
+    - name: Dispatch Opensource Workflow
+      if: ${{ env.REPO_OWNER != 'cFS' }}
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: 'nasa',
+            repo: 'cFS',
+            workflow_id: 'build-deploy-doc.yml',
+            ref: '${{ github.ref_name }}',
+            inputs: {
+              target: process.env.TARGET,
+              cache_key: process.env.CACHE_KEY,
+              buildpdf: process.env.BUILDPDF,
+              deploy: process.env.DEPLOY
+            }
+          })
 
-      - name: Dispatch Opensource Workflow
-        if: ${{ env.REPO_OWNER != 'cFS' }}
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'nasa',
-              repo: 'cFS',
-              workflow_id: 'build-deploy-doc.yml',
-              ref: '${{ github.ref_name }}'',
-              inputs: {
-                target: process.env.TARGET,
-                cache_key: process.env.CACHE_KEY,
-                buildpdf: process.env.BUILDPDF,
-                deploy: process.env.DEPLOY
-              }
-            })
             
   deploy-documentation:
     name: Deploy documentation to gh-pages    
