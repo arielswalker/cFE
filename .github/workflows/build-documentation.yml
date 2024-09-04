@@ -55,7 +55,7 @@ jobs:
       - name: Copy cFS Workflow
         run: |
           mkdir -p .github/workflows
-          cp -r cfs-repo/.github/workflows/build-deploy-doc.yml ./.github/workflows/build-deploy-doc.yml
+          cp -r cfs-repo/.github/workflows/build-deploy-doc.yml .github/workflows/build-deploy-doc.yml
         
   build-cfe-usersguide:
     name: Build and deploy cFE Docs
