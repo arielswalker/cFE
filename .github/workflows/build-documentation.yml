@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/cFS
+          path: cfs-repo
           submodules: true
 
       - name: Checkout submodule
@@ -53,41 +54,22 @@ jobs:
   build-cfe-usersguide:
     name: Build and deploy cFE Docs
     needs: checkout-and-cache
-    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-
-    steps:
-    
-      - name: Dynamically Build and deploy cFE Docs
-        uses: jenseng/dynamic-uses@v1
-        with:
-          uses: ${{ github.repository_owner == 'cFS' && 'cFS/cFS/.github/workflows/build-deploy-doc.yml@main' || 'nasa/cFS/.github/workflows/build-deploy-doc.yml@main' }}
-          with: | 
-            {
-              "target": "[\"cfe-usersguide\"]",
-              "cache-key": "cfs-doc-${{ github.run_number }}",
-              "buildpdf": "${{ github.event_name == 'push' && contains(github.ref, 'main')}}",
-              "deploy": "false"  # Note can't use cache with deploy, deploy in following job instead
-            }
+    uses: ./cfs-repo/.github/workflows/build-deploy-doc.yml
+    with:
+      target: "[\"cfe-usersguide\"]"
+      cache-key: cfs-doc-${{ github.run_number }}
+      buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+      deploy: false  # Note can't use cache with deploy, deploy in following job instead
       
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc
-    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-
-    steps:
-    
-      - name: Dynamically Build Mission Doc
-        uses: jenseng/dynamic-uses@v1
-        with:
-          uses: ${{ github.repository_owner == 'cFS' && 'cFS/cFS/.github/workflows/build-deploy-doc.yml@main' || 'nasa/cFS/.github/workflows/build-deploy-doc.yml@main' }}
-          with: |
-            {
-              "target": "[\"mission-doc\"]",
-              "cache-key": "cfs-doc-${{ github.run_number }}",
-              "deploy": false,
-              "buildpdf": false"
-            }
-
+    uses: ./cfs-repo/.github/workflows/build-deploy-doc.yml
+    with:
+      target: "[\"mission-doc\"]"
+      cache-key: cfs-doc-${{ github.run_number }}
+      deploy: false
+      buildpdf: false # No need for mission pdf within cFE, done at bundle level
           
   deploy-documentation:
     name: Deploy documentation to gh-pages    
