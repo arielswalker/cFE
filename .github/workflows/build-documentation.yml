@@ -75,7 +75,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/cFS
-          
+      - name: Copy Workflow
+        run: cp -r cfs-repo/.github/workflows/build-deploy-doc.yml ./.github/workflows/build-deploy-doc.yml
+        
       - name: Build Mission Doc
         uses: ./.github/workflows/build-deploy-doc.yml
         with:
