@@ -54,9 +54,9 @@ jobs:
     needs: checkout-and-cache
     name: Build and deploy cFE Docs
     #uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
-    uses: ./.github/workflows/build-deploy-doc.yml
+    uses: ./cFS/.github/workflows/build-deploy-doc.yml
     with:
-      path: ${{ github.repository }}
+      path: ${{ github.repository_owner }}
       branch: main
       target: "[\"cfe-usersguide\"]"
       cache-key: cfs-doc-${{ github.run_number }}
@@ -67,9 +67,9 @@ jobs:
     needs: checkout-and-cache
     name: Build Mission Doc
     #uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
-    uses: ./.github/workflows/build-deploy-doc.yml
+    uses: ./cFS/.github/workflows/build-deploy-doc.yml
     with:
-      path: ${{ github.repository }}
+      path: ${{ github.repository_owner }}
       branch: main
       target: '["mission-doc"]'
       cache-key: cfs-doc-${{ github.run_number }}
