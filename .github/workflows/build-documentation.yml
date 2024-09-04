@@ -51,32 +51,54 @@ jobs:
           key: cfs-doc-${{ github.run_number }}
 
   build-cfe-usersguide:
-    needs: checkout-and-cache
     name: Build and deploy cFE Docs
-    #uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
-    uses: ./.github/workflows/build-deploy-doc.yml
-    with:
-      path: ${{ github.repository_owner }}/cFS
-      branch: main
-      target: "[\"cfe-usersguide\"]"
-      cache-key: cfs-doc-${{ github.run_number }}
-      buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
-      deploy: false  # Note can't use cache with deploy, deploy in following job instead
-
-  build-mission-doc:
     needs: checkout-and-cache
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    
+    steps:
+      
+      - name: Build and deploy Opensource cFE Docs
+        if: ${{ github.repository_owner == 'nasa' }}
+        uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
+        with:
+          target: "[\"cfe-usersguide\"]"
+          cache-key: cfs-doc-${{ github.run_number }}
+          buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+          deploy: false  # Note can't use cache with deploy, deploy in following job instead
+      
+      - name: Build and deploy Internal cFE Docs
+        if: ${{ github.repository_owner == 'cFS' }}
+        uses: cFS/cFS/.github/workflows/build-deploy-doc.yml@main
+        with:
+          target: "[\"cfe-usersguide\"]"
+          cache-key: cfs-doc-${{ github.run_number }}
+          buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+          deploy: false  # Note can't use cache with deploy, deploy in following job instead
+          
+  build-mission-doc:  
     name: Build Mission Doc
-    #uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
-    uses: ./.github/workflows/build-deploy-doc.yml
-    with:
-      path: ${{ github.repository_owner }}/cFS
-      branch: main
-      target: '["mission-doc"]'
-      cache-key: cfs-doc-${{ github.run_number }}
-      deploy: false
-      buildpdf: false # No need for mission pdf within cFE, done at bundle level
-
-
+    needs: checkout-and-cache
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    
+    steps:
+      - name: Build and deploy Opensource cFE Docs
+        if: ${{ github.repository_owner == 'nasa' }}
+        uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
+        with:
+          target: '["mission-doc"]'
+          cache-key: cfs-doc-${{ github.run_number }}
+          deploy: false
+          buildpdf: false # No need for mission pdf within cFE, done at bundle level
+          
+      - name: Build and deploy Internal cFE Docs
+        if: ${{ github.repository_owner == 'cFS' }}
+        uses: cFS/cFS/.github/workflows/build-deploy-doc.yml@main
+        with:
+          target: '["mission-doc"]'
+          cache-key: cfs-doc-${{ github.run_number }}
+          deploy: false
+          buildpdf: false # No need for mission pdf within cFE, done at bundle level
+          
   deploy-documentation:
     needs: build-cfe-usersguide
     if: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
