@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/cFS
+          ref: main
           path: cfs-repo
           submodules: true
 
@@ -51,18 +52,11 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
 
-      - name: Copy workflow
-        run: |
-          mkdir -p .github/workflows
-          # Copy the workflow file from the checkout cFS repository to the local .github/workflows directory
-          cp cfs-repo/.github/workflows/build-deploy-doc.yml .github/workflows/build-deploy-doc.yml
- 
   build-cfe-usersguide:
     name: Build and deploy cFE Docs
     needs: checkout-and-cache
-    uses: ./.github/workflows/build-deploy-doc.yml
+    uses: ./cfs-repo/.github/workflows/build-deploy-doc.yml
     with:
-      branch: main
       target: "[\"cfe-usersguide\"]"
       cache-key: cfs-doc-${{ github.run_number }}
       buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
@@ -71,9 +65,8 @@ jobs:
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc
-    uses: ./.github/workflows/build-deploy-doc.yml
+    uses: ./cfs-repo/.github/workflows/build-deploy-doc.yml
     with:
-      branch: main
       target: "[\"mission-doc\"]"
       cache-key: cfs-doc-${{ github.run_number }}
       deploy: false
