@@ -51,9 +51,11 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
       
-      - name: Copy Workflow
-        run: cp -r cfs-repo/.github/workflows/build-deploy-doc.yml ./.github/workflows/build-deploy-doc.yml
-         
+      - name: Copy Reusable Workflow
+        run: |
+          mkdir -p .github/workflows
+          cp cfs-repo/.github/workflows/build-deploy-doc.yml .github/workflows/build-deploy-doc.yml
+
   build-cfe-usersguide:
     name: Build and deploy cFE Docs
     needs: checkout-and-cache
