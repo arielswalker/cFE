@@ -55,12 +55,22 @@ jobs:
         run: |
           ls
           echo "1"
-          cd ../../
+          cd ../
           ls
           echo "2"
           cd cFE/cfs-repo
           ls
+          
+  copy-workflow:
+    name: Copy Workflow
+    needs: checkout-and-cache
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
+    steps:
+      - name: Checkout bundle
+        run: |
+          ls
+          cp cfs-repo/.github/workflows/build-deploy-doc.yml .github/workflows/build-deploy-doc.yml
 
   deploy-documentation:
     name: Deploy documentation to gh-pages    
