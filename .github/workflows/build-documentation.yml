@@ -53,6 +53,13 @@ jobs:
       
       - name: Copy Reusable Workflow
         run: |
+          ls
+          echo "1"
+          cd ../
+          ls
+          echo "2"
+          cd ./
+          ls
           cp ./cfs-repo/.github/workflows/build-deploy-doc.yml ./cFE/.github/workflows/build-deploy-doc.yml
       - name: test reusable
         uses: ./.github/workflows/build-deploy-doc.yml
