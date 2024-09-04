@@ -72,6 +72,9 @@ jobs:
       - name: Checkout bundle
         run: |
           ls
+          echo "1"
+          cd ../
+          ls
           cp cfs-repo/.github/workflows/build-deploy-doc.yml .github/workflows/build-deploy-doc.yml
 
   deploy-documentation:
