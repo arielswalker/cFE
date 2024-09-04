@@ -58,8 +58,10 @@ jobs:
           cd ../
           ls
           echo "2"
-          cd cFE/cfs-repo
+          cd cFE/cfe
           ls
+          cd ../
+          cp cfs-repo/.github/workflows/build-deploy-doc.yml cfe/.github/workflows/build-deploy-doc.yml
           
   copy-workflow:
     name: Copy Workflow
