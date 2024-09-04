@@ -72,10 +72,14 @@ jobs:
       - name: Checkout bundle
         run: |
           ls
+          ls -R
           echo "1"
           cd ../
           ls
-          cp cfs-repo/.github/workflows/build-deploy-doc.yml .github/workflows/build-deploy-doc.yml
+          ls -R
+          cd ../../
+          ls
+          ls -R
 
   deploy-documentation:
     name: Deploy documentation to gh-pages    
