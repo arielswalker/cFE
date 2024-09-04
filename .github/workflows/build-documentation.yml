@@ -58,11 +58,10 @@ jobs:
           cd ../
           ls
           echo "2"
-          cd ./
+          cd cFE/cfs-repo
           ls
-          cp ./cfs-repo/.github/workflows/build-deploy-doc.yml ./cFE/.github/workflows/build-deploy-doc.yml
       - name: test reusable
-        uses: ./.github/workflows/build-deploy-doc.yml
+        uses: ./cfs-repo/.github/workflows/build-deploy-doc.yml
 
           
   deploy-documentation:
