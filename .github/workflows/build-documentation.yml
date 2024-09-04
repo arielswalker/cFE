@@ -36,7 +36,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ github.repository_owner }}/cFS
-          path: ./cfs-repo
           submodules: true
 
       - name: Checkout submodule
@@ -57,33 +56,37 @@ jobs:
           echo "1"
           cd ../
           ls
-          echo "2"
-          cd cFE/cfe
-          ls
-          cd ../
-          cp cfs-repo/.github/workflows/build-deploy-doc.yml cfe/.github/workflows/build-deploy-doc.yml
-          
-  copy-workflow:
-    name: Copy Workflow
-    needs: checkout-and-cache
-    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
-    steps:
-      - name: Checkout bundle
-        run: |
-          ls
-          ls -R
-          echo "1"
-          cd ../
-          ls
-          ls -R
-          cd ../../
-          ls
-          ls -R
+      - name: Upload workflow file
+        id: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: workflow-file
+          path: .github/workflows/build-deploy-doc.yml
+          
+  build-cfe-usersguide:
+    name: Build and deploy cFE Docs
+    needs: checkout-and-cache
+    uses: ./.github/workflows/build-deploy-doc.yml
+    with:
+      target: "[\"cfe-usersguide\"]"
+      cache-key: cfs-doc-${{ github.run_number }}
+      buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+      deploy: false  # Note can't use cache with deploy, deploy in following job instead
+      
+  build-mission-doc:
+    needs: checkout-and-cache
+    name: Build Mission Doc
+    uses: ./.github/workflows/build-deploy-doc.yml
+    with:
+      target: "[\"mission-doc\"]"
+      cache-key: cfs-doc-${{ github.run_number }}
+      deploy: false
+      buildpdf: false # No need for mission pdf within cFE, done at bundle level
 
   deploy-documentation:
     name: Deploy documentation to gh-pages    
-    #needs: build-cfe-usersguide
+    needs: build-cfe-usersguide
     if: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
