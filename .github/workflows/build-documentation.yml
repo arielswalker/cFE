@@ -51,48 +51,24 @@ jobs:
           key: cfs-doc-${{ github.run_number }}
           
   build-cfe-usersguide:
-    name: Build and deploy cFE Docs
     needs: checkout-and-cache
+    name: Build and deploy cFE Docs
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-    
+
     steps:
-    - name: Dispatch Internal Workflow
-      if: ${{ env.REPO_OWNER == 'cDS' }}
-      uses: actions/github-script@v6
+
+    - name: Find cFS Github Files
+      run: |
+        cd ../
+        ls
+      
+    - name: Run Build Deploy Doc
+      uses: ./.github/workflows/build-deploy-doc.yml
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          await github.rest.actions.createWorkflowDispatch({
-            owner: 'cFS',
-            repo: 'cFS',
-            workflow_id: 'build-deploy-doc.yml',
-            ref: '${{ github.ref_name }}', // Fixed extra quote here
-            inputs: {
-              target: process.env.TARGET,
-              cache_key: process.env.CACHE_KEY,
-              buildpdf: process.env.BUILDPDF,
-              deploy: process.env.DEPLOY
-            }
-          })
-    
-    - name: Dispatch Opensource Workflow
-      if: ${{ env.REPO_OWNER != 'cFS' }}
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          await github.rest.actions.createWorkflowDispatch({
-            owner: 'nasa',
-            repo: 'cFS',
-            workflow_id: 'build-deploy-doc.yml',
-            ref: '${{ github.ref_name }}',
-            inputs: {
-              target: process.env.TARGET,
-              cache_key: process.env.CACHE_KEY,
-              buildpdf: process.env.BUILDPDF,
-              deploy: process.env.DEPLOY
-            }
-          })
+        target: "[\"cfe-usersguide\"]"
+        cache-key: cfs-doc-${{ github.run_number }}
+        buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+        deploy: false  # Note can't use cache with deploy, deploy in following job instead
 
             
   deploy-documentation:
