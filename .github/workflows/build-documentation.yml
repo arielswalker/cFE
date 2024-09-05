@@ -52,7 +52,6 @@ jobs:
           
       - name: Find cFS Github Files
         run: |
-          cd cFS
           ls
         
       - name: Run Build Deploy Doc
