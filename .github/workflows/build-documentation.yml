@@ -50,6 +50,19 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
           
+      - name: Find cFS Github Files
+        run: |
+          cd cFS
+          ls
+        
+      - name: Run Build Deploy Doc
+        uses: ./.github/workflows/build-deploy-doc.yml
+        with:
+          target: "[\"cfe-usersguide\"]"
+          cache-key: cfs-doc-${{ github.run_number }}
+          buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+          deploy: false  # Note can't use cache with deploy, deploy in following job instead
+          
   build-cfe-usersguide:
     needs: checkout-and-cache
     name: Build and deploy cFE Docs
