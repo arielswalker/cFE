@@ -53,17 +53,64 @@ jobs:
       - name: Use different action based on condition
         if: ${{ github.repository_owner == 'cFS' }}
         uses: my-org/action-b@viksdghk1
+        
+      - name: Trigger Internal Workflow
+        if: ${{ github.event.inputs.repo != 'cFS' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.actions.createWorkflowDispatch({
+              owner: 'arielswalker',
+              repo: 'cFS',
+              workflow_id: 'internal-workflow.yml',
+              ref: '${{ github.event.inputs.branch }}'
+            });
 
+      - name: Trigger External Workflow
+        if: ${{ github.event.inputs.repo == 'external-repo' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.actions.createWorkflowDispatch({
+              owner: 'external-org',
+              repo: 'external-repo',
+              workflow_id: 'external-workflow.yml',
+              ref: '${{ github.event.inputs.branch }}'
+            });
+            
   build-cfe-usersguide:
     needs: checkout-and-cache
     name: Build and deploy cFE Docs
-    uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
-    with:
-      target: "[\"cfe-usersguide\"]"
-      cache-key: cfs-doc-${{ github.run_number }}
-      buildpdf: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
-      deploy: false  # Note can't use cache with deploy, deploy in following job instead
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout bundle
+        uses: actions/checkout@v3
+        with:
+          repository: arielswalker/cFS
+          submodules: true
+
+      - name: Checkout submodule
+        uses: actions/checkout@v3
+        with:
+          path: cfe
+
+      - name: Run Build Document Script for Job 3
+        env:
+          TARGET: "[\"cfe-usersguide\"]"
+          CACHE_KEY: "dcfs-doc-${{ github.run_number }}"
+          DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
+          BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
+        run: |
+          ls
+          cd .github/scripts
+          ls
+          # Make the script executable if necessary
+          chmod +x ./build-deploy-doc.sh
+          
+          # Run the script
+          ./build-deploy-doc.sh
+  
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc
