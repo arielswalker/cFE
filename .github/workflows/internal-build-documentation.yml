@@ -1,12 +1,8 @@
 name: cFS Documentation and Guides
 
 on:
-  push:
-  pull_request:
-  workflow_dispatch:
-  schedule:
-    # 10:45 PM UTC every Sunday
-    - cron:  '45 22 * * 0'
+  repository_dispatch:
+    types: [trigger-internal]
 
 
 jobs:
