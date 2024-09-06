@@ -28,6 +28,9 @@ jobs:
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
       - name: Set Variables
         id: vars
         run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
