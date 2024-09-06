@@ -1,4 +1,4 @@
-name: cFS Documentation and Guides
+name: cFS Documentation and Guides Action
 
 on:
   push:
@@ -51,7 +51,7 @@ jobs:
         uses: arielswalker/cFS/build-document@main
 
       - name: Use different action based on condition
-        if: ${{ env.CUSTOM_CONDITION == 'cFS' }}
+        if: ${{ github.repository_owner == 'cFS' }}
         uses: my-org/action-b@viksdghk1
 
   build-cfe-usersguide:
