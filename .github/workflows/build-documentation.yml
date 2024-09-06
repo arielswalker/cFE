@@ -45,31 +45,24 @@ jobs:
         with:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
+    
+      - name: Run Build Document Script for Job 3
+        env:
+          TARGET: "[\"cfe-usersguide\"]"
+          CACHE_KEY: "dcfs-doc-${{ github.run_number }}"
+          DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
+          BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
+        run: |
+          ls
+          cd .github/scripts
+          ls
+          # Make the script executable if necessary
+          chmod +x ./build-deploy-doc.sh
           
-      - name: Trigger Internal Workflow
-        if: ${{ github.event.inputs.repo != 'cFS' }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.actions.createWorkflowDispatch({
-              owner: 'arielswalker',
-              repo: 'cFS',
-              workflow_id: 'internal-workflow.yml',
-              ref: '${{ github.event.inputs.branch }}'
-            });
-
-      - name: Trigger External Workflow
-        if: ${{ github.event.inputs.repo == 'external-repo' }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.actions.createWorkflowDispatch({
-              owner: 'external-org',
-              repo: 'external-repo',
-              workflow_id: 'external-workflow.yml',
-              ref: '${{ github.event.inputs.branch }}'
-            });
-            
+          # Run the script
+          ./build-deploy-doc.sh
+        
+    
   build-cfe-usersguide:
     needs: checkout-and-cache
     name: Build and deploy cFE Docs
@@ -87,22 +80,7 @@ jobs:
         with:
           path: cfe
 
-      - name: Run Build Document Script for Job 3
-        env:
-          TARGET: "[\"cfe-usersguide\"]"
-          CACHE_KEY: "dcfs-doc-${{ github.run_number }}"
-          DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
-          BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
-        run: |
-          ls
-          cd .github/scripts
-          ls
-          # Make the script executable if necessary
-          chmod +x ./build-deploy-doc.sh
-          
-          # Run the script
-          ./build-deploy-doc.sh
-  
+
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc
