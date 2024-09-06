@@ -52,15 +52,9 @@ jobs:
           CACHE_KEY: "dcfs-doc-${{ github.run_number }}"
           DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
           BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
-        run: |
-          ls
-          cd .github/scripts
-          ls
-          # Make the script executable if necessary
-          chmod +x ./build-deploy-doc.sh
-          
+        run: |          
           # Run the script
-          ./build-deploy-doc.sh
+          ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF"
         
     
   build-cfe-usersguide:
