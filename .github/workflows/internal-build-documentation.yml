@@ -1,8 +1,7 @@
 name: cFS Documentation and Guides
 
 on:
-  repository_dispatch:
-    types: [trigger-internal]
+  workflow_dispatch:
 
 
 jobs:
