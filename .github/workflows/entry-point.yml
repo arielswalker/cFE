@@ -1,0 +1,47 @@
+name: 'Entry Point Workflow'
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    
+jobs:
+  # Checks for duplicate actions. Skips push actions if there is a matching or
+  # duplicate pull-request action.
+  checks-for-duplicates:
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          concurrent_skipping: 'same_content'
+          skip_after_successful_duplicate: 'true'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+ 
+  select-internal-external:
+    name: Use internal or external workflow
+    needs: checks-for-duplicates
+    if: ${{ needs.checks-for-duplicates.outputs.should_skip != 'true' || contains(github.ref, 'main') }}
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+
+    steps:
+      - name: Set Variables
+        id: vars
+        run: echo "REPO_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
+
+      - name: Conditional Workflow Invocation
+        run: |
+          if [[ "${{ env.REPO_OWNER }}" == "nasa" ]]; then
+            echo "Triggering internal workflow..."
+            gh workflow run internal-build-document.yml
+          elif [[ "${{ env.REPO_OWNER }}" == "cFS" ]]; then
+            echo "Triggering external workflow..."
+            gh workflow run external-build-document.yml
+          else
+            echo "No matching workflow."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
