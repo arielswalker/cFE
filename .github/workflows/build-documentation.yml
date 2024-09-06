@@ -31,7 +31,7 @@ jobs:
       - name: Checkout bundle
         uses: actions/checkout@v3
         with:
-          repository: nasa/cFS
+          repository: arielswalker/cFS
           submodules: true
 
       - name: Checkout submodule
