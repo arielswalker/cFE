@@ -46,14 +46,6 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
           
-      - name: Use action based on condition
-        if: ${{ github.repository_owner != 'cFS' }}
-        uses: arielswalker/cFS/build-document@main
-
-      - name: Use different action based on condition
-        if: ${{ github.repository_owner == 'cFS' }}
-        uses: my-org/action-b@viksdghk1
-        
       - name: Trigger Internal Workflow
         if: ${{ github.event.inputs.repo != 'cFS' }}
         uses: actions/github-script@v6
