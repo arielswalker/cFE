@@ -34,7 +34,7 @@ jobs:
 
       - name: Conditional Workflow Invocation
         run: |
-          if [[ "${{ env.REPO_OWNER }}" == "nasa" ]]; then
+          if [[ "${{ env.REPO_OWNER }}" !== "cFS" ]]; then
             echo "Triggering internal workflow..."
             gh workflow run internal-build-document.yml
           elif [[ "${{ env.REPO_OWNER }}" == "cFS" ]]; then
