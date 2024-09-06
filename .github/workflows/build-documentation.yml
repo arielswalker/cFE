@@ -54,6 +54,7 @@ jobs:
           BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
         run: |          
           # Run the script
+          chmod +x ./.github/scripts/build-deploy-doc.sh
           ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF"
         
     
