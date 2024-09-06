@@ -74,7 +74,6 @@ jobs:
         with:
           path: cfe
 
-
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc
