@@ -102,31 +102,32 @@ jobs:
             ${{ matrix.target }}_stdout.txt
             ${{ matrix.target }}_stderr.txt
             ${{ matrix.target }}-warnings.log
-            ${{ matrix.target }}.pdf
+        
+      - name: Archive PDF
+        if: ${{ env.BUILD_PDF == true }} 
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}_pdf
+          path: ${{ matrix.target }}.pdf
 
   deploy-documentation:
     needs: build-docs
-# if: ${{ github.event_name == 'push' && contains(github.ref, 'main') && needs.build-docs.outputs.DEPLOY == 'true' }}
+    if: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
     name: Deploy documentation to gh-pages
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
     steps:
-      - name: Checkout bundle
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Download cFE Users Guide Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cfe-usersguide_doc_build_logs
-          path: ./ 
+      - uses: actions/download-artifact@v3
 
       - name: Display structure of downloaded files
         run: ls -R
 
       - name: Move pdfs to deployment directory
-        run: mkdir deploy; mv cfe-usersguide.pdf deploy/
+        run: mkdir deploy; mv */*.pdf deploy
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
