@@ -1,4 +1,4 @@
-name: cFS Documentation and Guides Action
+name: cFS Documentation and Guides Script
 
 on:
   push:
@@ -48,7 +48,7 @@ jobs:
     
       - name: Run Build Document Script for Job 3
         env:
-          TARGET: "[\"cfe-usersguide\"]"
+          TARGET: '["cfe-usersguide"]'
           CACHE_KEY: "dcfs-doc-${{ github.run_number }}"
           DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
           BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
