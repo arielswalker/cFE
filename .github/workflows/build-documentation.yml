@@ -55,7 +55,7 @@ jobs:
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     strategy:
       matrix:
-        target: ['["cfe-usersguide"]', '["mission-doc"]']
+        target: ['cfe-usersguide', 'mission-doc']
     env:
       CACHE_KEY: "cfs-doc-${{ github.run_number }}"
       DEPLOY: "false"
