@@ -73,7 +73,12 @@ jobs:
           
       - name: Set Build PDF Variable
         id: set-build-pdf
-        run: echo "BUILD_PDF=${{ matrix.target == 'cfe-usersguide' && github.event_name == 'push' && contains(github.ref, 'main') || 'false' }}" >> $GITHUB_ENV
+        run: |
+          if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
+            echo "BUILD_PDF=${{ github.event_name == 'push' && contains(github.ref, 'main') }}" >> $GITHUB_ENV
+          else
+            echo "BUILD_PDF=false" >> $GITHUB_ENV
+          fi
 
       - name: Debug Environment Variables
         run: |
