@@ -111,7 +111,7 @@ jobs:
           path: ${{ matrix.target }}.pdf
 
       - name: Deploy to GitHub
-        if: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/heads/main')) || (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
+        if: ${{ (matrix.target == "cfe-usersguide" && github.event_name == 'push' && contains(github.ref, 'refs/heads/main')) || (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
