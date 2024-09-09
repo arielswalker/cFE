@@ -75,6 +75,14 @@ jobs:
         id: set-build-pdf
         run: echo "BUILD_PDF=${{ matrix.target == 'cfe-usersguide' && github.event_name == 'push' && contains(github.ref, 'main') || 'false' }}" >> $GITHUB_ENV
 
+      - name: Debug Environment Variables
+        run: |
+          echo "CACHE_KEY: $CACHE_KEY"
+          echo "DEPLOY: $DEPLOY"
+          echo "BUILD_PDF: $BUILD_PDF"
+          echo "APP_NAME: $APP_NAME"
+          echo "NEEDS_OSAL_API: $NEEDS_OSAL_API"
+    
       - name: Run Build Document Script
         run: |
           chmod +x ./.github/scripts/build-deploy-doc.sh
