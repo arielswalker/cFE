@@ -54,7 +54,7 @@ jobs:
           TARGET: '["cfe-usersguide"]'
           CACHE_KEY: "cfs-doc-${{ github.run_number }}"
           DEPLOY: "false"
-          BUILD_PDF: "false" # No need for mission pdf within cFE, done at bundle level
+          BUILD_PDF: "true" # No need for mission pdf within cFE, done at bundle level
           APP_NAME: ""
           NEEDS_OSAL_API: "true"
         run: |          
@@ -69,6 +69,7 @@ jobs:
             cfe-usersguide_stdout.txt
             cfe-usersguide_stderr.txt
             cfe-usersguide-warnings.log
+            cfe-usersguide.pdf
              
   deploy-documentation:
     needs: checkout-and-cache
