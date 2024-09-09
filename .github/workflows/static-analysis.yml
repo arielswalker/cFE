@@ -39,3 +39,17 @@ jobs:
         env:
           STRICT_DIR_LIST: './modules/core_api/fsw ./modules/core_private/fsw ./modules/es/fsw ./modules/evs/fsw ./modules/fs/fsw ./modules/msg/fsw ./modules/resourceid/fsw ./modules/sb/fsw ./modules/sbr/fsw ./modules/tbl/fsw ./modules/time/fsw -UCFE_PLATFORM_TIME_CFG_CLIENT -DCFE_PLATFORM_TIME_CFG_SERVER'
           
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: cppcheck_err.sarif
+
+      - name: Upload Static Analysis Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-errors
+          path: cppcheck-errors.tar.gz
+      
+      - name: Check for reported errors
+        run: tail -n 1 cppcheck_err.txt | grep -q '^\*\*0 error(s) reported\*\*$'
+        
