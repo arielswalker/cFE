@@ -55,7 +55,7 @@ jobs:
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     strategy:
       matrix:
-        target: ['cfe-usersguide', 'mission-doc']
+        target: ['["cfe-usersguide"]', '["mission-doc"]']
     env:
       CACHE_KEY: "cfs-doc-${{ github.run_number }}"
       DEPLOY: "false"
@@ -79,20 +79,20 @@ jobs:
           else
             echo "BUILD_PDF=false" >> $GITHUB_ENV
           fi
-
-      - name: Debug Environment Variables
+          
+      - name: Set Target Variable
+        id: set-target
         run: |
-          echo "CACHE_KEY: $CACHE_KEY"
-          echo "DEPLOY: $DEPLOY"
-          echo "BUILD_PDF: $BUILD_PDF"
-          echo "APP_NAME: $APP_NAME"
-          echo "NEEDS_OSAL_API: $NEEDS_OSAL_API"
-          echo "Matrix Target: ${{ matrix.target }}"
-    
+          if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
+            echo "TARGET_JSON='[\"cfe-usersguide\"]'" >> $GITHUB_ENV
+          elif [ "${{ matrix.target }}" == "mission-doc" ]; then
+            echo "TARGET_JSON='[\"mission-doc\"]'" >> $GITHUB_ENV
+          fi
+
       - name: Run Build Document Script
         run: |
           chmod +x ./.github/scripts/build-deploy-doc.sh
-          ./.github/scripts/build-deploy-doc.sh "${{ matrix.target }}" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
+          ./.github/scripts/build-deploy-doc.sh "${TARGET_JSON}" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
 
       - name: Archive Document Build Logs
         uses: actions/upload-artifact@v4
