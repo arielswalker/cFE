@@ -72,6 +72,15 @@ jobs:
           chmod +x ./.github/scripts/build-deploy-doc.sh
           ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
 
+      - name: Archive Document Build Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: cfe-usersguide_doc_build_logs
+          path: |
+            cfe-usersguide_stdout.txt
+            cfe-usersguide_stderr.txt
+            cfe-usersguide-warnings.log
+            
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc    
@@ -94,7 +103,16 @@ jobs:
         run: |          
           chmod +x ./.github/scripts/build-deploy-doc.sh
           ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
-        
+
+      - name: Archive Document Build Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission-doc_doc_build_logs
+          path: |
+            mission-doc_stdout.txt
+            mission-doc_stderr.txt
+            mission-doc-warnings.log
+            
   deploy-documentation:
     needs: build-cfe-usersguide
     if: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
