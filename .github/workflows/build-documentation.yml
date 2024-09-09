@@ -4,12 +4,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    # 10:45 PM UTC every Sunday
+    - cron:  '45 22 * * 0'
 
 jobs:
   # Checks for duplicate actions. Skips push actions if there is a matching or
   # duplicate pull-request action.
   checks-for-duplicates:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     # Map a step output to a job output
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
@@ -25,7 +28,7 @@ jobs:
     name: Custom checkout and cache for cFS documents
     needs: checks-for-duplicates
     if: ${{ needs.checks-for-duplicates.outputs.should_skip != 'true' || contains(github.ref, 'main') }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout bundle
@@ -46,53 +49,57 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
     
-      - name: Run Build Document Script for Job 3
+  build-cfe-usersguide:
+    needs: checkout-and-cache
+    name: Build and deploy cFE Docs
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+
+    steps:
+      - name: Get Script
+        uses: actions/checkout@v3
+        with:
+          repository: arielswalker/cFS
+          
+      - name: Run Build Document Script
         env:
           TARGET: '["cfe-usersguide"]'
-          CACHE_KEY: "dcfs-doc-${{ github.run_number }}"
+          CACHE_KEY: "cfs-doc-${{ github.run_number }}"
+          DEPLOY: "false"
+          BUILD_PDF: "false" # No need for mission pdf within cFE, done at bundle level
+          APP_NAME: ""
+          NEEDS_OSAL_API: "true"
+        run: |          
+          chmod +x ./.github/scripts/build-deploy-doc.sh
+          ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
+
+  build-mission-doc:
+    needs: checkout-and-cache
+    name: Build Mission Doc    
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    
+    steps:
+      - name: Get script
+        uses: actions/checkout@v3
+        with:
+          repository: arielswalker/cFS
+          
+      - name: Run Build Document Script
+        env:
+          TARGET: '["mission-doc"]'
+          CACHE_KEY: "cfs-doc-${{ github.run_number }}"
           DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
           BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}"
           APP_NAME: ""
           NEEDS_OSAL_API: "true"
         run: |          
-          # Run the script
           chmod +x ./.github/scripts/build-deploy-doc.sh
           ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
         
-    
-  build-cfe-usersguide:
-    needs: checkout-and-cache
-    name: Build and deploy cFE Docs
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout bundle
-        uses: actions/checkout@v3
-        with:
-          repository: arielswalker/cFS
-          submodules: true
-
-      - name: Checkout submodule
-        uses: actions/checkout@v3
-        with:
-          path: cfe
-
-  build-mission-doc:
-    needs: checkout-and-cache
-    name: Build Mission Doc
-    #uses: nasa/cFS/.github/workflows/build-deploy-doc.yml
-    uses: nasa/cFS/.github/workflows/build-deploy-doc.yml@main
-    with:
-      target: "[\"mission-doc\"]"
-      cache-key: cfs-doc-${{ github.run_number }}
-      deploy: false
-      buildpdf: false # No need for mission pdf within cFE, done at bundle level
-
   deploy-documentation:
     needs: build-cfe-usersguide
     if: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
     name: Deploy documentation to gh-pages
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
     steps:
       - uses: actions/checkout@v3
