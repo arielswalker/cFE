@@ -20,6 +20,11 @@ jobs:
         with:
           repository: arielswalker/cFS
           submodules: true
+  
+      - name: Checkout submodule
+        uses: actions/checkout@v3
+        with:
+          path: cfe
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
