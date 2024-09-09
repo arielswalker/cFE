@@ -84,9 +84,9 @@ jobs:
         id: set-target
         run: |
           if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
-            echo "TARGET_JSON='[\"cfe-usersguide\"]'" >> $GITHUB_ENV
+            echo "TARGET_JSON='["cfe-usersguide"]'" >> $GITHUB_ENV
           elif [ "${{ matrix.target }}" == "mission-doc" ]; then
-            echo "TARGET_JSON='[\"mission-doc\"]'" >> $GITHUB_ENV
+            echo "TARGET_JSON='["mission-doc"]'" >> $GITHUB_ENV
           fi
 
       - name: Run Build Document Script
