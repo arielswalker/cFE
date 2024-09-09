@@ -70,12 +70,6 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: ${{ env.CACHE_KEY }}
 
-      - name: Checkout Bundle Main
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-          repository: arielswalker/cFS
-
       - name: Checkout Repo
         if: ${{ env.APP_NAME != '' }}
         uses: actions/checkout@v4
