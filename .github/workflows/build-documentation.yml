@@ -87,6 +87,7 @@ jobs:
           echo "BUILD_PDF: $BUILD_PDF"
           echo "APP_NAME: $APP_NAME"
           echo "NEEDS_OSAL_API: $NEEDS_OSAL_API"
+          echo "Matrix Target: ${{ matrix.target }}"
     
       - name: Run Build Document Script
         run: |
