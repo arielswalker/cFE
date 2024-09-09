@@ -92,7 +92,7 @@ jobs:
       - name: Run Build Document Script
         run: |
           chmod +x ./.github/scripts/build-deploy-doc.sh
-          ./.github/scripts/build-deploy-doc.sh "${TARGET_JSON}" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
+          ./.github/scripts/build-deploy-doc.sh "$TARGET_JSON" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
 
       - name: Archive Document Build Logs
         uses: actions/upload-artifact@v4
