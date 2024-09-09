@@ -58,7 +58,7 @@ jobs:
         target: ['cfe-usersguide', 'mission-doc']
     env:
       CACHE_KEY: "cfs-doc-${{ github.run_number }}"
-      DEPLOY: "true"
+      DEPLOY: "false"
       APP_NAME: ""
       NEEDS_OSAL_API: "true"
       
@@ -106,7 +106,7 @@ jobs:
 
   deploy-documentation:
     needs: build-docs
-    if: ${{ github.event_name == 'push' && contains(github.ref, 'main') && needs.build-docs.outputs.DEPLOY == 'true' }}
+# if: ${{ github.event_name == 'push' && contains(github.ref, 'main') && needs.build-docs.outputs.DEPLOY == 'true' }}
     name: Deploy documentation to gh-pages
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
