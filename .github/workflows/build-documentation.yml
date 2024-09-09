@@ -49,60 +49,20 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: cfs-doc-${{ github.run_number }}
 
-  build-cfe-usersguide:
+  build-docs:
     needs: checkout-and-cache
-    name: Build and deploy cFE Docs    
+    name: Build cFE and Mission Docs
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    strategy:
+      matrix:
+        target: ['cfe-usersguide', 'mission-doc']
     env:
-      TARGET: '["cfe-usersguide"]'
       CACHE_KEY: "cfs-doc-${{ github.run_number }}"
-      DEPLOY: "false" # Note can't use cache with deploy, deploy in following job instead
-      BUILD_PDF: "${{ github.event_name == 'push' && contains(github.ref, 'main')}}" 
+      DEPLOY: "false"
+      BUILD_PDF: ${{ matrix.target == 'cfe-usersguide' && (github.event_name == 'push' && contains(github.ref, 'main')) || 'false' }}
       APP_NAME: ""
       NEEDS_OSAL_API: "true"
-      
-    steps:
-      - name: Get cache if supplied
-        id: cache-src-bld
-        if: ${{ env.CACHE_KEY != '' }}
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
-          key: ${{ env.CACHE_KEY }}
 
-      - name: Checkout Repo
-        if: ${{ env.APP_NAME != '' }}
-        uses: actions/checkout@v4
-        with:
-          path: apps/${{ env.APP_NAME}}
-          
-      - name: Run Build Document Script
-        run: |          
-          chmod +x ./.github/scripts/build-deploy-doc.sh
-          ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
-
-      - name: Archive Document Build Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.TARGET }}_doc_build_logs
-          path: |
-            ${{ env.TARGET }}_stdout.txt
-            ${{ env.TARGET }}_stderr.txt
-            ${{ env.TARGET }}-warnings.log
-            ${{ env.TARGET }}.pdf
-            
-  build-mission-doc:
-    needs: checkout-and-cache
-    name: Build Mission Doc  
-    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-    env:
-      TARGET: '["mission-doc"]'
-      CACHE_KEY: "cfs-doc-${{ github.run_number }}"
-      DEPLOY: "false" 
-      BUILD_PDF: "false" # No need for mission pdf within cFE, done at bundle level
-      APP_NAME: ""
-      NEEDS_OSAL_API: "true"
-      
     steps:
       - name: Get cache if supplied
         id: cache-src-bld
@@ -116,47 +76,52 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-          repository: arielswalker/cFS
+          repository: nasa/cFS
 
       - name: Checkout Repo
         if: ${{ env.APP_NAME != '' }}
         uses: actions/checkout@v4
         with:
-          path: apps/${{ env.APP_NAME}}
-          
+          path: apps/${{ env.APP_NAME }}
+
       - name: Run Build Document Script
-        run: |          
+        run: |
           chmod +x ./.github/scripts/build-deploy-doc.sh
-          ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
+          ./.github/scripts/build-deploy-doc.sh "${{ matrix.target }}" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
 
       - name: Archive Document Build Logs
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.TARGET }}_doc_build_logs
+          name: ${{ matrix.target }}_doc_build_logs
           path: |
-            ${{ env.TARGET }}_stdout.txt
-            ${{ env.TARGET }}_stderr.txt
-            ${{ env.TARGET }}-warnings.log
-            ${{ env.TARGET }}.pdf
-                
+            ${{ matrix.target }}_stdout.txt
+            ${{ matrix.target }}_stderr.txt
+            ${{ matrix.target }}-warnings.log
+            ${{ matrix.target }}.pdf
+
   deploy-documentation:
-    needs: build-cfe-usersguide
-    if: ${{ github.event_name == 'push' && contains(github.ref, 'main')}}
+    needs: build-docs
+    if: ${{ github.event_name == 'push' && contains(github.ref, 'main') && needs.build-docs.outputs.DEPLOY == 'true' }}
     name: Deploy documentation to gh-pages
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout bundle
+        uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v3
+      - name: Download cFE Users Guide Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cfe-usersguide_doc_build_logs
+          path: ./ 
 
       - name: Display structure of downloaded files
         run: ls -R
 
       - name: Move pdfs to deployment directory
-        run: mkdir deploy; mv */*.pdf deploy
+        run: mkdir deploy; mv cfe-usersguide.pdf deploy/
 
-      - name: Deploy to GitHub
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
