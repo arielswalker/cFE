@@ -59,7 +59,6 @@ jobs:
     env:
       CACHE_KEY: "cfs-doc-${{ github.run_number }}"
       DEPLOY: "false"
-      BUILD_PDF: ${{ matrix.target == 'cfe-usersguide' && (github.event_name == 'push' && contains(github.ref, 'main')) || 'false' }}
       APP_NAME: ""
       NEEDS_OSAL_API: "true"
 
@@ -71,6 +70,10 @@ jobs:
         with:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: ${{ env.CACHE_KEY }}
+          
+      - name: Set Build PDF Variable
+        id: set-build-pdf
+        run: echo "BUILD_PDF=${{ matrix.target == 'cfe-usersguide' && github.event_name == 'push' && contains(github.ref, 'main') || 'false' }}" >> $GITHUB_ENV
 
       - name: Run Build Document Script
         run: |
