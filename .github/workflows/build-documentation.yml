@@ -112,7 +112,7 @@ jobs:
         # pandoc ${{ matrix.target }}.pdf -t gfm
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 
           
       - name: Deploy to GitHub
         uses: JamesIves/github-pages-deploy-action@3.7.1
