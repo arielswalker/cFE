@@ -38,6 +38,11 @@ jobs:
         with:
           repository: arielswalker/cFS
           submodules: true
+
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
+        with:
+           submodules: recursive
           
       - name: Make the Script Executable
         run: chmod +x ./.github/scripts/codeql.sh
@@ -50,11 +55,11 @@ jobs:
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
 
-      - name: debug
+      - name: Move Sarif
         run: |
           mv cfe/Codeql-${{ matrix.target }}.sarif .
           
-      - name: filter-sarif
+      - name: Filter Sarif
         uses: advanced-security/filter-sarif@v1
         with:
             patterns: |
