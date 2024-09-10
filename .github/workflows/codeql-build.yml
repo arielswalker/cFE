@@ -20,10 +20,10 @@ jobs:
           repository: arielswalker/cFS
           
       - name: Make the Script Executable
-        run: chmod +x ./scripts/codeql.sh
+        run: chmod +x ./.github/scripts/codeql.sh
         
       - name: Run CodeQL Analysis Script
-        run: ./scripts/codeql.sh 
+        run: ./.github/scripts/codeql.sh 
         env:
           COMPONENT_PATH: 'cfe'
           MAKE_COMMAND: 'make -j8'
