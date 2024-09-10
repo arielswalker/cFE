@@ -76,7 +76,7 @@ jobs:
         run: |
           if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
             echo "TARGET=[\"cfe-usersguide\"]" >> $GITHUB_ENV
-            echo "BUILD_PDF=${{ github.event_name == 'push' && contains(github.ref, 'main') }}" >> $GITHUB_ENV
+            echo "BUILD_PDF=true" >> $GITHUB_ENV
             echo "DEPLOY=true" >> $GITHUB_ENV
           elif [ "${{ matrix.target }}" == "mission-doc" ]; then
             echo "TARGET=[\"mission-doc\"]" >> $GITHUB_ENV
