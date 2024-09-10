@@ -53,6 +53,8 @@ jobs:
     needs: checkout-and-cache
     name: Build cFE and Mission Docs
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    env:
+      CACHE_KEY: "cfs-doc-${{ github.run_number }}"
     strategy:
       matrix:
         target: ['cfe-usersguide', 'mission-doc']
