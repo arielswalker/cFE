@@ -27,6 +27,9 @@ jobs:
     name: Run CodeQL
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     needs: check-for-duplicates
+    strategy:
+      matrix:
+        target: ['coding-standard', 'security']
     steps:
     
       - name: Checkout bundle
@@ -41,6 +44,7 @@ jobs:
       - name: Run CodeQL Analysis Script
         run: ./.github/scripts/codeql.sh 
         env:
+          TARGET: ${{ matrix.target }}
           COMPONENT_PATH: 'cfe'
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
