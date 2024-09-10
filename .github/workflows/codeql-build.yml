@@ -64,16 +64,16 @@ jobs:
                 -**/*.md
                 -**/*.txt
                 -**/*.dox
-            input: Codeql-${{ matrix.scan-type }}.sarif
-            output: Codeql-${{ matrix.scan-type }}.sarif
+            input: Codeql-${{ matrix.target }}.sarif
+            output: Codeql-${{ matrix.target }}.sarif
             
       - name: Archive Sarif
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQL-Sarif-${{ matrix.scan-type }}
-          path: CodeQL-${{ matrix.scan-type }}
+          name: CodeQL-Sarif-${{ matrix.target }}
+          path: CodeQL-${{ matrix.target }}
 
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: Codeql-${{ matrix.scan-type }}.sarif
+          sarif_file: Codeql-${{ matrix.target }}.sarif
