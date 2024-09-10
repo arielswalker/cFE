@@ -10,7 +10,7 @@ on:
 
 jobs:
   codeql:
-    name: Run cppcheck
+    name: Run CodeQL
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
 
     steps:
@@ -30,3 +30,15 @@ jobs:
           COMPONENT_PATH: 'cfe'
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
+      
+      - name: Archive Sarif
+        uses: actions/upload-artifact@v4
+        with:
+          name: CodeQL-Sarif
+          path: CodeQL-Sarif
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: CodeQL-Sarif-${{ matrix.scan-type }}/Codeql-${{ matrix.scan-type }}.sarif
+          
