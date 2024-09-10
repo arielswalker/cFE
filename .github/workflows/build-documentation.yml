@@ -75,11 +75,11 @@ jobs:
         id: set-target
         run: |
           if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
-            echo "TARGET=[\"cfe-usersguide\"]" >> $GITHUB_ENV
+            echo "TARGET=cfe-usersguide" >> $GITHUB_ENV
             echo "BUILD_PDF=true" >> $GITHUB_ENV
             echo "DEPLOY=true" >> $GITHUB_ENV
           elif [ "${{ matrix.target }}" == "mission-doc" ]; then
-            echo "TARGET=[\"mission-doc\"]" >> $GITHUB_ENV
+            echo "TARGET=mission-doc" >> $GITHUB_ENV
             echo "BUILD_PDF=false" >> $GITHUB_ENV
             echo "DEPLOY=false" >> $GITHUB_ENV
           fi
