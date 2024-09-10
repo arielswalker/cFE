@@ -107,9 +107,12 @@ jobs:
 
       - name: Move pdfs to deployment directory
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
-        run: mkdir deploy; mv ${{ matrix.target }}.pdf deploy
-        # Could add pandoc and convert to github markdown
-        # pandoc ${{ matrix.target }}.pdf -t gfm
+        run: |
+          mkdir deploy
+          mv ${{ matrix.target }}.pdf deploy
+          ls -al deploy
+          # Could add pandoc and convert to github markdown
+          # pandoc ${{ matrix.target }}.pdf -t gfm
 
       - name: Checkout Repo      
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
