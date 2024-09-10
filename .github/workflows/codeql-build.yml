@@ -12,8 +12,9 @@ jobs:
   codeql:
     name: Run cppcheck
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-    
+
     steps:
+    
       - name: Checkout bundle
         uses: actions/checkout@v3
         with:
