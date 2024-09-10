@@ -111,13 +111,6 @@ jobs:
         # Could add pandoc and convert to github markdown
         # pandoc ${{ matrix.target }}.pdf -t gfm
 
-  deploy-docs:
-    needs: build-docs
-    name: Deploy Docs
-#    if: ${{ needs.build-docs.outputs.BUILD_PDF == 'true' && needs.build-docs.outputs.DEPLOY == 'true' }}
-    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-    steps:
-    
       - name: Checkout Repo
         uses: actions/checkout@v4
           
