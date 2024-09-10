@@ -80,3 +80,5 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: Codeql-${{ matrix.target }}.sarif
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkout_path: cfe
