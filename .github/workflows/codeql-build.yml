@@ -26,6 +26,7 @@ jobs:
   codeql:
     name: Run CodeQL
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    needs: check-for-duplicates
     strategy:
       matrix:
         target: ['coding-standard', 'security']
