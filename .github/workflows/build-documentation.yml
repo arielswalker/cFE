@@ -119,10 +119,6 @@ jobs:
           ls -a
           # Could add pandoc and convert to github markdown
           # pandoc ${{ matrix.target }}.pdf -t gfm
-
-      - name: Checkout Repo      
-        if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
-        uses: actions/checkout@v4 
           
       - name: Deploy to GitHub
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
