@@ -50,6 +50,11 @@ jobs:
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
 
+      - name: debug
+        run: |
+          ls -a
+          echo "$(pwd)"
+          
       - name: filter-sarif
         uses: advanced-security/filter-sarif@v1
         with:
