@@ -42,15 +42,24 @@ jobs:
           COMPONENT_PATH: 'cfe'
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
-      
+
+      - name: filter-sarif
+        uses: advanced-security/filter-sarif@v1
+        with:
+            patterns: |
+                -**/*.md
+                -**/*.txt
+                -**/*.dox
+            input: Codeql-${{ matrix.scan-type }}.sarif
+            output: Codeql-${{ matrix.scan-type }}.sarif
+            
       - name: Archive Sarif
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQL-Sarif
-          path: CodeQL-Sarif
+          name: CodeQL-Sarif-${{ matrix.scan-type }}
+          path: CodeQL-${{ matrix.scan-type }}
 
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: CodeQL-Sarif-${{ matrix.scan-type }}/Codeql-${{ matrix.scan-type }}.sarif
-          
+          sarif_file: Codeql-${{ matrix.scan-type }}.sarif
