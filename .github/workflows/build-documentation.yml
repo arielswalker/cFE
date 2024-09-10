@@ -114,7 +114,7 @@ jobs:
   deploy-docs:
     needs: build-docs
     name: Deploy Docs
-    if: ${{ needs.build-docs.outputs.BUILD_PDF == 'true' && needs.build-docs.outputs.DEPLOY == 'true' }}
+#    if: ${{ needs.build-docs.outputs.BUILD_PDF == 'true' && needs.build-docs.outputs.DEPLOY == 'true' }}
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     steps:
     
