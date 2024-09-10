@@ -108,9 +108,20 @@ jobs:
       - name: Move pdfs to deployment directory
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
         run: mkdir deploy; mv ${{ matrix.target }}.pdf deploy
-        
+        # Could add pandoc and convert to github markdown
+        # pandoc ${{ matrix.target }}.pdf -t gfm
+
+  deploy-docs:
+    needs: build-docs
+    name: Deploy Docs
+    if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    steps:
+    
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+          
       - name: Deploy to GitHub
-        if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
