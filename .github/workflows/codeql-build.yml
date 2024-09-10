@@ -27,9 +27,6 @@ jobs:
     name: Run CodeQL
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
     needs: check-for-duplicates
-    strategy:
-      matrix:
-        target: ['coding-standard', 'security']
     steps:
     
       - name: Checkout bundle
@@ -38,22 +35,12 @@ jobs:
           repository: arielswalker/cFS
           submodules: true
           
-      - name: Set Unique Variables
-        id: set-target
-        run: |
-          if [ "${{ matrix.target }}" == "coding-standard" ]; then
-            echo "TARGET=coding-standard" >> $GITHUB_ENV
-          elif [ "${{ matrix.target }}" == "security" ]; then
-            echo "TARGET=security" >> $GITHUB_ENV
-          fi   
-          
       - name: Make the Script Executable
         run: chmod +x ./.github/scripts/codeql.sh
         
       - name: Run CodeQL Analysis Script
         run: ./.github/scripts/codeql.sh 
         env:
-          TARGET: ${{ env.TARGET }}
           COMPONENT_PATH: 'cfe'
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
@@ -65,16 +52,20 @@ jobs:
                 -**/*.md
                 -**/*.txt
                 -**/*.dox
-            input: Codeql-${{ matrix.target }}.sarif
-            output: Codeql-${{ matrix.target }}.sarif
+            input: CodeQL-security.sarif
+            output: Codeql-security.sarif
             
       - name: Archive Sarif
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQL-Sarif-${{ matrix.target }}
-          path: CodeQL-${{ matrix.target }}
+          name: CodeQL-Sarif
+          path: |
+            CodeQL-coding-standard.sarif
+            CodeQL-security.sarif
 
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: Codeql-${{ matrix.target }}.sarif
+          sarif_file: |
+            CodeQL-coding-standard.sarif
+            CodeQL-security.sarif
