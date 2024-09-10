@@ -12,7 +12,9 @@ jobs:
   codeql:
     name: Run CodeQL
     runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
-
+    strategy:
+      matrix:
+        target: ['coding-standard', 'security']
     steps:
     
       - name: Checkout bundle
@@ -21,12 +23,22 @@ jobs:
           repository: arielswalker/cFS
           submodules: true
           
+      - name: Set Unique Variables
+        id: set-target
+        run: |
+          if [ "${{ matrix.target }}" == "coding-standard" ]; then
+            echo "TARGET=coding-standard" >> $GITHUB_ENV
+          elif [ "${{ matrix.target }}" == "security" ]; then
+            echo "TARGET=security" >> $GITHUB_ENV
+          fi   
+          
       - name: Make the Script Executable
         run: chmod +x ./.github/scripts/codeql.sh
         
       - name: Run CodeQL Analysis Script
         run: ./.github/scripts/codeql.sh 
         env:
+          TARGET: ${{ env.TARGET }}
           COMPONENT_PATH: 'cfe'
           MAKE_COMMAND: 'make -j8'
           TEST_FLAG: 'true'
