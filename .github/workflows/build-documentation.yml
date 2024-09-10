@@ -114,6 +114,9 @@ jobs:
           mkdir deploy
           mv ${{ matrix.target }}.pdf deploy
           ls -a
+          echo "cd in deploy"
+          cd deploy
+          ls -a
           # Could add pandoc and convert to github markdown
           # pandoc ${{ matrix.target }}.pdf -t gfm
 
