@@ -38,12 +38,6 @@ jobs:
         with:
           repository: arielswalker/cFS
           submodules: true
-
-      - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
-        with:
-           submodules: recursive
-           path: cfe
           
       - name: Make the Script Executable
         run: chmod +x ./.github/scripts/codeql.sh
@@ -81,4 +75,4 @@ jobs:
         with:
           sarif_file: Codeql-${{ matrix.target }}.sarif
           token: ${{ secrets.GITHUB_TOKEN }}
-          checkout_path: cfe
+          
