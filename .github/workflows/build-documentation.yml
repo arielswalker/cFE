@@ -107,7 +107,7 @@ jobs:
 
       - name: Move pdfs to deployment directory
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
-        run: mkdir deploy; mv */*.pdf deploy
+        run: mkdir deploy; mv *.pdf deploy
         
       - name: Deploy to GitHub
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
