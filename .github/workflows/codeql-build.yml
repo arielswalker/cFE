@@ -54,6 +54,11 @@ jobs:
         run: |
           ls -a
           echo "$(pwd)"
+          echo "cfe folder"
+          cd cfe
+          echo "$(pwd)"
+          ls -a
+          
           
       - name: filter-sarif
         uses: advanced-security/filter-sarif@v1
