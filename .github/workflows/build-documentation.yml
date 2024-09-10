@@ -57,8 +57,8 @@ jobs:
       matrix:
         target: ['cfe-usersguide', 'mission-doc']
     env:
+      # Shared variables 
       CACHE_KEY: "cfs-doc-${{ github.run_number }}"
-      DEPLOY: "false"
       APP_NAME: ""
       NEEDS_OSAL_API: "true"
       
@@ -71,22 +71,17 @@ jobs:
           path: /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/*
           key: ${{ env.CACHE_KEY }}
           
-      - name: Set Build PDF Variable
-        id: set-build-pdf
-        run: |
-          if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
-            echo "BUILD_PDF=${{ github.event_name == 'push' && contains(github.ref, 'main') }}" >> $GITHUB_ENV
-          else
-            echo "BUILD_PDF=false" >> $GITHUB_ENV
-          fi
-          
-      - name: Set Target Variable
+      - name: Set Unique Variables
         id: set-target
         run: |
           if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
             echo "TARGET=[\"cfe-usersguide\"]" >> $GITHUB_ENV
+            echo "BUILD_PDF=${{ github.event_name == 'push' && contains(github.ref, 'main') }}" >> $GITHUB_ENV
+            echo "DEPLOY=true" >> $GITHUB_ENV
           elif [ "${{ matrix.target }}" == "mission-doc" ]; then
             echo "TARGET=[\"mission-doc\"]" >> $GITHUB_ENV
+            echo "BUILD_PDF=false" >> $GITHUB_ENV
+            echo "DEPLOY=false" >> $GITHUB_ENV
           fi
 
       - name: Run Build Document Script
@@ -111,7 +106,7 @@ jobs:
           path: ${{ matrix.target }}.pdf
 
       - name: Deploy to GitHub
-        if: ${{ (matrix.target == 'cfe-usersguide' && github.event_name == 'push' && contains(github.ref, 'refs/heads/main')) || (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
+        if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
