@@ -1,4 +1,4 @@
-name: "CodeQL Analysis"
+name: "CodeQL Analysis Script"
 
 on:
   push:
@@ -10,8 +10,21 @@ on:
 
 jobs:
   codeql:
-    uses: nasa/cFS/.github/workflows/codeql-reusable.yml@main
-    with: 
-      component-path: cfe
-      make: make -j8
-      test: true
+    name: Run cppcheck
+    runs-on: ${{ github.repository_owner == 'cFS' && 'linux' || 'ubuntu-latest' }}
+    
+    steps:
+      - name: Checkout bundle
+        uses: actions/checkout@v3
+        with:
+          repository: arielswalker/cFS
+          
+      - name: Make the Script Executable
+        run: chmod +x ./scripts/codeql.sh
+        
+      - name: Run CodeQL Analysis Script
+        run: ./scripts/codeql.sh 
+        env:
+          COMPONENT_PATH: 'cfe'
+          MAKE_COMMAND: 'make -j8'
+          TEST_FLAG: 'true'
