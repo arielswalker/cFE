@@ -99,12 +99,16 @@ jobs:
             ${{ matrix.target }}-warnings.log
         
       - name: Archive PDF
-        if: ${{ env.BUILD_PDF == true }} 
+        if: ${{ env.BUILD_PDF == 'true' }} 
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}_pdf
           path: ${{ matrix.target }}.pdf
 
+      - name: Move pdfs to deployment directory
+        if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
+        run: mkdir deploy; mv */*.pdf deploy
+        
       - name: Deploy to GitHub
         if: ${{ (env.BUILD_PDF == 'true' && env.DEPLOY == 'true') }}
         uses: JamesIves/github-pages-deploy-action@3.7.1
