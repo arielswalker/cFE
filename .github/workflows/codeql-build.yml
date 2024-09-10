@@ -62,7 +62,7 @@ jobs:
                 -**/*.md
                 -**/*.txt
                 -**/*.dox
-            input: ${{ env.COMPONENT_PATH }}/CodeQL-${{ matrix.target }}.sarif
+            input: cfe/CodeQL-${{ matrix.target }}.sarif
             output: Codeql-${{ matrix.target }}.sarif
             
       - name: Archive Sarif
