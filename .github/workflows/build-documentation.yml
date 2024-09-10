@@ -56,11 +56,6 @@ jobs:
     strategy:
       matrix:
         target: ['cfe-usersguide', 'mission-doc']
-    env:
-      # Shared variables 
-      CACHE_KEY: "cfs-doc-${{ github.run_number }}"
-      APP_NAME: ""
-      NEEDS_OSAL_API: "true"
       
     steps:
       - name: Get cache if supplied
@@ -81,12 +76,20 @@ jobs:
             echo "BUILD_PDF=false" >> $GITHUB_ENV
             echo "DEPLOY=false" >> $GITHUB_ENV
           fi
+      - name: Make the Script Executable
+        run: chmod +x ./.github/scripts/build-deploy-doc.sh
+        
+      - name: Run CodeQL Analysis Script
+        run: ./.github/scripts/build-deploy-doc.sh
+        env:
+          TARGET: ${{ matrix.target }}
+          CACHE_KEY: "cfs-doc-${{ github.run_number }}"
+          DEPLOY: ${{ env.DEPLOY }}
+          BUILD_PDF: ${{ env.BUILD_PDF }}
+          APP_NAME: ""
+          NEEDS_OSAL_API: "true"
 
-      - name: Run Build Document Script
-        run: |
-          chmod +x ./.github/scripts/build-deploy-doc.sh
-          ./.github/scripts/build-deploy-doc.sh "${{ matrix.target }}" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
-
+      
       - name: Archive Document Build Logs
         uses: actions/upload-artifact@v4
         with:
