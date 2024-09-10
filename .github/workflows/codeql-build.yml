@@ -52,13 +52,7 @@ jobs:
 
       - name: debug
         run: |
-          ls -a
-          echo "$(pwd)"
-          echo "cfe folder"
-          cd cfe
-          echo "$(pwd)"
-          ls -a
-          
+          mv cfe/Codeql-${{ matrix.target }}.sarif .
           
       - name: filter-sarif
         uses: advanced-security/filter-sarif@v1
@@ -67,16 +61,16 @@ jobs:
                 -**/*.md
                 -**/*.txt
                 -**/*.dox
-            input: cfe/Codeql-${{ matrix.target }}.sarif
+            input: Codeql-${{ matrix.target }}.sarif
             output: Codeql-${{ matrix.target }}.sarif
             
       - name: Archive Sarif
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQL-Sarif
-          path: CodeQL-${{ matrix.target }}.sarif
+          name: CodeQL-Sarif-${{ matrix.target }}
+          path: Codeql-${{ matrix.target }}.sarif
 
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: CodeQL-${{ matrix.target }}.sarif
+          sarif_file: Codeql-${{ matrix.target }}.sarif
