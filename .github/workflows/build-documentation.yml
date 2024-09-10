@@ -75,11 +75,9 @@ jobs:
         id: set-target
         run: |
           if [ "${{ matrix.target }}" == "cfe-usersguide" ]; then
-            echo "TARGET=cfe-usersguide" >> $GITHUB_ENV
             echo "BUILD_PDF=true" >> $GITHUB_ENV
             echo "DEPLOY=true" >> $GITHUB_ENV
           elif [ "${{ matrix.target }}" == "mission-doc" ]; then
-            echo "TARGET=mission-doc" >> $GITHUB_ENV
             echo "BUILD_PDF=false" >> $GITHUB_ENV
             echo "DEPLOY=false" >> $GITHUB_ENV
           fi
@@ -87,7 +85,7 @@ jobs:
       - name: Run Build Document Script
         run: |
           chmod +x ./.github/scripts/build-deploy-doc.sh
-          ./.github/scripts/build-deploy-doc.sh "$TARGET" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
+          ./.github/scripts/build-deploy-doc.sh "${{ matrix.target }}" "$CACHE_KEY" "$DEPLOY" "$BUILD_PDF" "$APP_NAME" "$NEEDS_OSAL_API"
 
       - name: Archive Document Build Logs
         uses: actions/upload-artifact@v4
