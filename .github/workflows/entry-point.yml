@@ -39,7 +39,7 @@ jobs:
         run: |
           if [[ "${{ env.REPO_OWNER }}" != "cFS" ]]; then
             echo "Triggering internal workflow..."
-            gh workflow run internal-build-documentation.yml
+            gh workflow run build-name.yml --ref entry-point-workflow
           elif [[ "${{ env.REPO_OWNER }}" == "cFS" ]]; then
             echo "Triggering external workflow..."
             gh workflow run external-build-documentation.yml
