@@ -24,7 +24,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        if: ${{ github.repository != 'cFS'}}
+        if: ${{ github.repository_owner != 'cFS'}}
         uses: fkirc/skip-duplicate-actions@master
         with:
           concurrent_skipping: 'same_content'
@@ -32,7 +32,7 @@ jobs:
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
 
       - id: skip_check_iternal
-        if: ${{ github.repository == 'cFS'}}
+        if: ${{ github.repository_owner == 'cFS'}}
         uses: cFS/skip-duplicate-actions@master
         with:
           concurrent_skipping: 'same_content'
