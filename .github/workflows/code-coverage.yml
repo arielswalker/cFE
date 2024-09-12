@@ -47,6 +47,8 @@ jobs:
         with:
           repository: nasa/cFS
           submodules: true
+          ref: main
+          token: ${{ github.token }}
 
       - name: Checkout submodule
         uses: actions/checkout@v3
