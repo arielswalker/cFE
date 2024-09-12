@@ -24,12 +24,22 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
+        if: ${{ github.repository != 'cFS'}}
         uses: fkirc/skip-duplicate-actions@master
         with:
           concurrent_skipping: 'same_content'
           skip_after_successful_duplicate: 'true'
           do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
 
+      - id: skip_check_iternal
+        if: ${{ github.repository == 'cFS'}}
+        uses: cFS/skip-duplicate-actions@master
+        with:
+          concurrent_skipping: 'same_content'
+          skip_after_successful_duplicate: 'true'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
+          
   Local-Test-Build:
     #Continue if check-for-duplicates found no duplicates. Always runs for pull-requests.
     needs: check-for-duplicates
