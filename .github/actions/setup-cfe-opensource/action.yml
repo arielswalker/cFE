@@ -19,50 +19,50 @@ runs:
     - name: Checkout PSP
       uses: actions/checkout@v4
       with:
-        repository: cFS/PSP
+        repository: nasa/PSP
         path: ${{ inputs.source-dir }}/psp
 
     - name: Checkout OSAL
       uses: actions/checkout@v4
       with:
-        repository: cFS/osal
+        repository: nasa/osal
         path: ${{ inputs.source-dir }}/osal
 
     - name: Checkout CI_LAB
       uses: actions/checkout@v4
       with:
-        repository: cFS/ci_lab
+        repository: nasa/ci_lab
         path: ${{ inputs.source-dir }}/apps/ci_lab
 
     - name: Checkout TO_LAB
       uses: actions/checkout@v4
       with:
-        repository: cFS/to_lab
+        repository: nasa/to_lab
         path: ${{ inputs.source-dir }}/apps/to_lab
 
     - name: Checkout SCH_LAB
       uses: actions/checkout@v4
       with:
-        repository: cFS/sch_lab
+        repository: nasa/sch_lab
         path: ${{ inputs.source-dir }}/apps/sch_lab
 
     - name: Checkout SAMPLE_APP
       uses: actions/checkout@v4
       with:
-        repository: cFS/sample_app
+        repository: nasa/sample_app
         path: ${{ inputs.source-dir }}/apps/sample_app
 
     - name: Checkout SAMPLE_LIB
       uses: actions/checkout@v4
       with:
-        repository: cFS/sample_lib
+        repository: nasa/sample_lib
         path: ${{ inputs.source-dir }}/libs/sample_lib
 
     - name: Checkout elf2cfetbl
       if: ${{ !env.CFE_EDS_ENABLED }}
       uses: actions/checkout@v4
       with:
-        repository: cFS/elf2cfetbl
+        repository: nasa/elf2cfetbl
         path: ${{ inputs.source-dir }}/tools/elf2cfetbl
 
     - name: Add elf2cfetbl subdir
@@ -75,7 +75,7 @@ runs:
       if: ${{ env.CFE_EDS_ENABLED }}
       uses: actions/checkout@v4
       with:
-        repository: cFS/EdsLib
+        repository: nasa/EdsLib
         path: ${{ inputs.source-dir }}/tools/eds
 
     - name: Add edslib subdir
@@ -87,17 +87,27 @@ runs:
         echo "add_subdirectory(eds/tool)" >> ./tools/CMakeLists.txt
         echo "add_subdirectory(eds/cfecfs)" >> ./tools/CMakeLists.txt
 
-    - name: Checkout commandline-tools
+    - name: Checkout commandline-tools from nasa/cFS
       uses: actions/checkout@v4
       with:
-        repository: cFS/commandline-tools
-        path: ${{ inputs.source-dir }}/tools/commandline-tools
+        repository: nasa/cFS
+        ref: draco-integration
+        sparse-checkout: |
+          tools/commandline-tools
+        sparse-checkout-cone-mode: false
+        path: ${{ inputs.source-dir }}/temp-cfs-checkout
+
+    - name: Move commandline-tools to correct location
+      shell: bash
+      run: |
+        mv ${{ inputs.source-dir }}/temp-cfs-checkout/tools/commandline-tools ${{ inputs.source-dir }}/tools/commandline-tools
+        rm -rf ${{ inputs.source-dir }}/temp-cfs-checkout
 
     - name: Add commandline-tools subdir
       shell: bash
       working-directory: ${{ inputs.source-dir }}
       run: echo "add_subdirectory(commandline-tools)" >> ./tools/CMakeLists.txt
-
+      
     - name: Checkout Preferred Ref
       if: ${{ inputs.preferred-ref != '' }}
       shell: bash
