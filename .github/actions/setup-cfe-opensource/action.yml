@@ -87,10 +87,6 @@ runs:
         echo "add_subdirectory(eds/tool)" >> ./tools/CMakeLists.txt
         echo "add_subdirectory(eds/cfecfs)" >> ./tools/CMakeLists.txt
 
-    - name: Add commandline-tools subdir
-      shell: bash
-      working-directory: ${{ inputs.source-dir }}
-      run: echo "add_subdirectory(commandline-tools)" >> ./tools/CMakeLists.txt
     - name: Checkout commandline-tools
       uses: actions/checkout@v4
       with:
