@@ -14,4 +14,4 @@ on:
 jobs:
   format-check:
     name: Run format check
-    uses: arielswalker/cFS/.github/workflows/format-check.yml@fix-946-make-format-check-reusable
+    uses: arielswalker/cFS/.github/workflows/format-check.yml@fix-cfs/workflows#177
