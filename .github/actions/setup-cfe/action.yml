@@ -8,6 +8,9 @@ inputs:
   source-dir:
     description: 'Directory to stage sources'
     required: true
+  org:
+    description: 'GitHub org that hosts the repos'
+    default: 'cFS'
 
 runs:
   using: 'composite'
@@ -19,50 +22,50 @@ runs:
     - name: Checkout PSP
       uses: actions/checkout@v4
       with:
-        repository: cFS/PSP
+        repository: ${{ inputs.org }}/PSP
         path: ${{ inputs.source-dir }}/psp
 
     - name: Checkout OSAL
       uses: actions/checkout@v4
       with:
-        repository: cFS/osal
+        repository: ${{ inputs.org }}/osal
         path: ${{ inputs.source-dir }}/osal
 
     - name: Checkout CI_LAB
       uses: actions/checkout@v4
       with:
-        repository: cFS/ci_lab
+        repository: ${{ inputs.org }}/ci_lab
         path: ${{ inputs.source-dir }}/apps/ci_lab
 
     - name: Checkout TO_LAB
       uses: actions/checkout@v4
       with:
-        repository: cFS/to_lab
+        repository: ${{ inputs.org }}/to_lab
         path: ${{ inputs.source-dir }}/apps/to_lab
 
     - name: Checkout SCH_LAB
       uses: actions/checkout@v4
       with:
-        repository: cFS/sch_lab
+        repository: ${{ inputs.org }}/sch_lab
         path: ${{ inputs.source-dir }}/apps/sch_lab
 
     - name: Checkout SAMPLE_APP
       uses: actions/checkout@v4
       with:
-        repository: cFS/sample_app
+        repository: ${{ inputs.org }}/sample_app
         path: ${{ inputs.source-dir }}/apps/sample_app
 
     - name: Checkout SAMPLE_LIB
       uses: actions/checkout@v4
       with:
-        repository: cFS/sample_lib
+        repository: ${{ inputs.org }}/sample_lib
         path: ${{ inputs.source-dir }}/libs/sample_lib
 
     - name: Checkout elf2cfetbl
       if: ${{ !env.CFE_EDS_ENABLED }}
       uses: actions/checkout@v4
       with:
-        repository: cFS/elf2cfetbl
+        repository: ${{ inputs.org }}/elf2cfetbl
         path: ${{ inputs.source-dir }}/tools/elf2cfetbl
 
     - name: Add elf2cfetbl subdir
@@ -75,7 +78,7 @@ runs:
       if: ${{ env.CFE_EDS_ENABLED }}
       uses: actions/checkout@v4
       with:
-        repository: cFS/EdsLib
+        repository: ${{ inputs.org }}/EdsLib
         path: ${{ inputs.source-dir }}/tools/eds
 
     - name: Add edslib subdir
@@ -90,7 +93,7 @@ runs:
     - name: Checkout commandline-tools
       uses: actions/checkout@v4
       with:
-        repository: cFS/commandline-tools
+        repository: ${{ inputs.org }}/cfs-commandline-tools
         path: ${{ inputs.source-dir }}/tools/commandline-tools
 
     - name: Add commandline-tools subdir
