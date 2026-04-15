@@ -1,4 +1,4 @@
-name: "Functional Test"
+name: "Internal Functional Test, EDS enabled"
 
 on:
   push:
@@ -13,24 +13,27 @@ on:
   workflow_dispatch:
   schedule:
     # 11:45 PM UTC every Sunday
-    - cron: '45 23 * * 0'
+    - cron:  '45 23 * * 0'
 
 env:
   SIMULATION: native
   ENABLE_UNIT_TESTS: false
   OMIT_DEPRECATED: true
-  BUILDTYPE: release
+  CFE_EDS_ENABLED: true
+  BUILDTYPE: debug
+  # jphfix should be release
 
 jobs:
+
   Local-Test-Build:
-    name: Build cFE
+    name: Build CFE
     runs-on: ubuntu-22.04
     container: ghcr.io/core-flight-system/cfsbuildenv-linux:latest
     timeout-minutes: 15
 
     steps:
-      - name: Checkout cFE
-        uses: actions/checkout@v3
+      - name: Checkout CFE
+        uses: actions/checkout@v4
         with:
           path: cfe
 
@@ -39,13 +42,12 @@ jobs:
         with:
           source-dir: .
           preferred-ref: ${{ github.head_ref }}
-          org: 'nasa'
 
       # Setup the build system
       - name: Set up for build
         run: make prep
 
-      - name: Build cFE
+      - name: Build CFE
         run: make install
 
       - name: Generate Startup Link
@@ -66,8 +68,8 @@ jobs:
       - name: Upload all artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: functional-test-bin
-          path: ./*.tar.xz
+            name: functional-test-eds-bin
+            path: ./*.tar.xz
 
   Execute-Test:
     name: Execute Functional Test
@@ -76,9 +78,9 @@ jobs:
       actions: read
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GH_HOST: github.com
+      GH_HOST: developer.nasa.gov
       GH_REPO: cFS/cFE
-    runs-on: ubuntu-22.04
+    runs-on: cfs-self-hosted
     needs: Local-Test-Build
     timeout-minutes: 15
 
@@ -86,15 +88,15 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: functional-test-bin
-          path: functional-test-bin
+          name: functional-test-eds-bin
+          path: functional-test-eds-bin
 
       - name: Unpack artifacts
         run: |
           for i in cpu1 host
           do
             mkdir -p "$i"
-            tar Jxv -C "$i" -f "$GITHUB_WORKSPACE/functional-test-bin/$i-bin.tar.xz"
+            tar Jxv -C "$i" -f "$GITHUB_WORKSPACE/functional-test-eds-bin/$i-bin.tar.xz"
           done
 
       - name: List Files
@@ -105,7 +107,7 @@ jobs:
         uses: nasa/cFS/actions/start-cfs-container@dev
         with:
           binary-dir: ${{ github.workspace }}/cpu1
-          exec-image: ghcr.io/core-flight-system/cfsbuildenv-linux:latest
+          exec-image: aetd-dockerlab.gsfc.nasa.gov/gsfc-cfs/github-actions-ci-cd/cfsexec-ubuntu22
 
       - name: Check CPU1 container
         id: check-cpu1
@@ -117,14 +119,14 @@ jobs:
       - name: Execute No-Op Check
         working-directory: ./host
         run: |
-          ./cmd_send -v --host=${{ steps.check-cpu1.outputs.ip-addr }} --endian=LE --pktid=0x1806 --cmdcode=0
+          ./cmd_send -v --host=${{ steps.check-cpu1.outputs.ip-addr }} --endian=EDS --pktid=CFE_ES/Application/CMD --cmdcode=NoopCmd
           sleep 2
           docker logs "${{ steps.start-cpu1.outputs.container-id }}" | grep -A 2 'CFE_ES 3: No-op command'
 
       - name: Launch Functional Test
         working-directory: ./host
         run: |
-          ./cmd_send -v --host=${{ steps.check-cpu1.outputs.ip-addr }} --pktid=0x1806 --cmdcode=4 --endian=LE --string="20:CFE_TEST" --string="20:CFE_TestMain" --string="64:cfe_testcase" --uint64=16384 --uint8=0 --uint8=0 --uint16=100 --uint32=0
+          ./cmd_send -v --host=${{ steps.check-cpu1.outputs.ip-addr }} --endian=EDS --pktid=CFE_ES/Application/CMD --cmdcode=StartAppCmd Application="CFE_TEST" AppEntryPoint="CFE_TestMain" AppFileName="cfe_testcase" StackSize=16384 Priority=100
           sleep 10
           docker logs "${{ steps.start-cpu1.outputs.container-id }}"
 
@@ -159,7 +161,7 @@ jobs:
         if: ${{ always() && steps.check-cpu1.outputs.ip-addr != '' }}
         working-directory: ./host
         run: |
-          ./cmd_send -v --host=${{ steps.check-cpu1.outputs.ip-addr }} --endian=LE --pktid=0x1806 --cmdcode=2 --half=0x0002
+          ./cmd_send -v --host=${{ steps.check-cpu1.outputs.ip-addr }} --endian=EDS --pktid=CFE_ES/Application/CMD --cmdcode=RestartCmd RestartType=2
           sleep 1
 
       - name: Stop CPU1 Container
