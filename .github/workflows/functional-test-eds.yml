@@ -42,6 +42,7 @@ jobs:
         with:
           source-dir: .
           preferred-ref: ${{ github.head_ref }}
+          org: nasa
 
       # Setup the build system
       - name: Set up for build
@@ -80,7 +81,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_HOST: developer.nasa.gov
       GH_REPO: cFS/cFE
-    runs-on: cfs-self-hosted
+    runs-on: ubuntu-22.04
     needs: Local-Test-Build
     timeout-minutes: 15
 
@@ -107,7 +108,7 @@ jobs:
         uses: nasa/cFS/actions/start-cfs-container@dev
         with:
           binary-dir: ${{ github.workspace }}/cpu1
-          exec-image: aetd-dockerlab.gsfc.nasa.gov/gsfc-cfs/github-actions-ci-cd/cfsexec-ubuntu22
+          exec-image: ghcr.io/core-flight-system/cfsbuildenv-linux:latest
 
       - name: Check CPU1 container
         id: check-cpu1
