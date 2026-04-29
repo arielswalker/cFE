@@ -29,9 +29,9 @@ runs:
     - name: Checkout OSAL
       uses: actions/checkout@v4
       with:
-        repository: ${{ inputs.org }}/osal
+        repository: arielswalker/osal
         path: ${{ inputs.source-dir }}/osal
-        ref: dev
+        ref: fix-1527-remove-obsolete-doxygen-tags
 
     - name: Checkout CI_LAB
       uses: actions/checkout@v4

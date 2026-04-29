@@ -50,7 +50,7 @@ jobs:
   build-cfe-usersguide:
     needs: checkout-and-cache
     name: Build and deploy cFE Docs
-    uses: nasa/cFS/.github/workflows/build-doc-reusable.yml@dev
+    uses: arielswalker/cFS/.github/workflows/build-doc-reusable.yml@test-nasa/osal1527
     with:
       target: "[\"cfe-usersguide\"]"
       cache-key: cfs-doc-${{ github.run_id }}
@@ -59,7 +59,7 @@ jobs:
   build-mission-doc:
     needs: checkout-and-cache
     name: Build Mission Doc
-    uses: nasa/cFS/.github/workflows/build-doc-reusable.yml@dev
+    uses: arielswalker/cFS/.github/workflows/build-doc-reusable.yml@test-nasa/osal1527
     with:
       target: "[\"mission-doc\"]"
       cache-key: cfs-doc-${{ github.run_id }}
